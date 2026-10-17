@@ -419,10 +419,10 @@ This is a computer-assisted result with no human referee. The row generator (for
 The programs are in the directory \texttt{code/} of the repository (\texttt{fast4.cpp}, \texttt{orth.cpp}, and the $133$ nets of the $p=7$ control, \texttt{nets7\_all.txt}; MIT licence). The output of the original run is not distributed: the computation is deterministic, so a new run reproduces it (the time column excepted). Requirements: AVX2, OpenMP; \texttt{-march=native} makes the build machine dependent. Compiler: MinGW-w64 GCC 16.1.0 (WinLibs); the compiler of the original run was not recorded and is assumed the same.
 \begin{verbatim}
 g++ -O3 -march=native -fopenmp orth.cpp -o orth
-./orth classes classes17.txt                          # 58161 class representatives
+./orth classes classes17.txt      # 58161 lines
 g++ -O3 -march=native -fopenmp -DP=17 fast4.cpp -o netrun17.exe
 OMP_NUM_THREADS=12 ./netrun17.exe classes17.txt 0 58161 run_out.txt run
-awk '{a2+=$7;s+=$13;c+=$17} END{print NR,a2,s,c}' run_out.txt   # 58161 627 0 0
+awk '{a2+=$7;s+=$13;c+=$17} END{print NR,a2,s,c}' run_out.txt  # 58161 627 0 0
 \end{verbatim}
 Interrupted runs resume by re-running the command (ids already in the output are skipped). The class list is written by \texttt{./orth classes <file>} (about $10$ s; the order of the lines depends on thread scheduling, the set does not, so compare sorted files). Cost: about $3$ s CPU per net on average (maximum $6.75$ s), about $4$ h wall clock on $12$ threads; memory a few hundred MB per thread.
 
