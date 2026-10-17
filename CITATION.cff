@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below (attribution is required)."
+title: "A projective plane of order 18 admits no collineation of order 17 (computer-assisted; not peer reviewed)"
+type: article
+authors:
+  - family-names: "Kobayashi"
+    given-names: "Yudai"
+    alias: "yudaikobayashi"
+abstract: "A proof that a projective plane of order 18 has no collineation of order 17. The homology case is excluded by a norm-parity argument; the triangle case is reduced to a finite problem and settled by a computer search. Derivations, programs and verification were mostly done by AI (Claude, Anthropic) under the author's direction. Not peer reviewed."
+date-released: 2026-10-17
+license: "CC-BY-4.0"
+keywords:
+  - projective plane
+  - collineation
+  - order 18
