@@ -1,0 +1,443 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black,pdftitle={A projective plane of order 18 admits no collineation of order 17 (computer-assisted)},pdfauthor={Yudai Kobayashi},pdfsubject={Finite geometry; preprint, not peer reviewed},pdfkeywords={projective plane, collineation, order 18, computer-assisted}]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\Zp}{\mathbb{Z}_{17}}
+\newcommand{\Zs}{\mathbb{Z}_{17}^{*}}
+\newcommand{\Fix}{\operatorname{Fix}}
+\newcommand{\Rows}{\mathrm{Rows}}
+\newcommand{\Orth}{\mathrm{Orth}}
+
+\title{A projective plane of order $18$ admits no collineation of order $17$\\(computer-assisted, conditional on assumptions A1--A5)}
+\author{Yudai Kobayashi}
+\date{}
+
+\setlength{\emergencystretch}{3em}\setlist{topsep=2pt,partopsep=0pt}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We prove that a projective plane of order $18$ has no collineation $\sigma$ of order $17$.
+Counting arguments and Bruck's bound on subplanes (only $m^2\le n$ is used) show that $\sigma$ has either exactly three fixed points, forming a triangle, or exactly twenty, namely a line plus an external point.
+The second case is excluded by an orbit-matrix argument over $\ZZ[\zeta_{17}]$: since $2$ has order $8$ modulo $17$, the primes above $2$ are self-conjugate, which forces the number of non-fixed orbits to be even, but it is $19$.
+For the first case we derive from the axioms a reduction to $58{,}161$ equivalence classes of orthomorphisms of $\ZZ_{17}$ with pairwise compatibility conditions on ``rows''; an exhaustive computer search shows that no class has a solution.
+The triangle case is therefore computer-assisted, and the theorem holds under assumptions A1--A5 (Section~\ref{sec:assumptions}).
+Baer's theorem on involutions is not used.
+\end{abstract}
+
+\section{Introduction}\label{sec:intro}
+
+A projective plane of order $n$ has $n^2+n+1$ points, $n+1$ points on every line, and a unique line through any two points.
+Planes of prime-power order exist; none is known otherwise, and the Bruck--Ryser theorem \cite{BruckRyser49} excludes infinitely many orders. Order $10$ was excluded by a large computation \cite{LTS89} building on coding theory \cite{MST73}. Order $18=3^2+3^2$ is not excluded by Bruck--Ryser.
+
+\begin{theorem}\label{thm:main}
+A projective plane $\Pi$ of order $18$ has no collineation of order $17$.
+This is computer-assisted: the case of three fixed points is proved by an exhaustive search, and the theorem holds under the assumptions A1--A5 of Section~\ref{sec:assumptions}.
+\end{theorem}
+
+\paragraph{Context.}
+Baer \cite[Thm.~5, Cor.~6]{Baer46} shows that in a plane of non-square order every involution is a perspectivity; we do not use this.
+MacWilliams--Sloane--Thompson \cite{MST73} (text not obtained; we rely on the report in \cite[Sec.~2]{LTS89}), the survey \cite{Lam91}, and \cite{AssmusKey92,Perrott16} concern order~$10$ and codes of designs. Janko--Tran Van Trung \cite{JankoTran81} (text not obtained, not relied on) restrict collineation groups for small orders.
+Orbit matrices over group rings are a standard tool; we found no primary reference stating the norm-parity lemma of Section~\ref{sec:homology} in the form used here and make no claim that it is new.
+We were \emph{unable to verify} whether Theorem~\ref{thm:main} or the exclusion of the homology configuration already appears in the literature (e.g.\ for orders $12,15,18$ or orbit matrices of $(343,19,1)$ designs); the elementary parts may be routine to experts. We do not claim that Theorem~\ref{thm:main} is new; we were unable to find it in the literature we could access. The reduction of the triangle case to orthomorphisms of $\ZZ_{17}$ and its complete enumeration may be of interest.
+
+\section{Preliminaries}\label{sec:prelim}
+
+Throughout, $\Pi$ has order $n=18$, $v=n^2+n+1=343$, and $\sigma$ is a collineation of prime order $p=17$; orbit indices live in $\Zp=\ZZ/17$.
+Quoted facts (nothing else from the literature is used):
+\begin{enumerate}[label=\textbf{Q\arabic*.},leftmargin=*,itemsep=0pt]
+\item (Counting.) The incidence matrix $N$ satisfies $NN^{T}=N^{T}N=nI+J$.
+\item (Bruck \cite[Lemma~3.1]{Bruck55}.) If a plane of order $n$ has a proper subplane of order $m$, then $n=m^2$ or $n\ge m^2+m$; we use only $m^2\le n$.
+\item (Cyclotomic fields.) For $\zeta=e^{2\pi i/p}$, the ring of integers of $K=\QQ(\zeta)$ is $\ZZ[\zeta]$, $\mathrm{Gal}(K/\QQ)\cong(\ZZ/p)^{*}$ via $\gamma_a:\zeta\mapsto\zeta^a$, and $\gamma_{-1}$ is complex conjugation. A prime $q\ne p$ is unramified, and the decomposition group of each prime above $q$ is generated by $\gamma_q$.
+\end{enumerate}
+
+\begin{lemma}\label{lem:orbits}
+Let $\sigma$ have prime order $p$ in a plane of order $n$, with $f$ fixed points.
+\begin{enumerate}[label=(\alph*),itemsep=0pt]
+\item Orbits on points and on lines have length $1$ or $p$; $f\equiv n^2+n+1\pmod p$, and a fixed line carrying $f_L$ fixed points has $f_L\equiv n+1\pmod p$.
+\item The numbers of fixed points and of fixed lines are equal; hence so are the numbers of non-fixed point orbits and line orbits.
+\item The line through two fixed points is fixed; the intersection of two fixed lines is fixed.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+(a) Orbit lengths divide $p$. Non-fixed points form orbits of length $p$; so do the non-fixed points of a fixed line, which has $n+1$ points.
+(b) Let $A,B$ be the permutation matrices of $\sigma$ on points and lines; $AN=NB$. By Q1, $\det N\ne0$ ($\det(nI+J)=n^{v-1}(n+v)$), so $B=N^{-1}AN$ and $\operatorname{tr}A=\operatorname{tr}B$, these being the numbers of fixed points and lines.
+(c) $\sigma$ maps the line $xy$ ($x,y$ fixed) to a line through $x,y$; dually.
+\end{proof}
+Here $343\equiv3$ and $19\equiv2\pmod{17}$.
+
+\section{The fixed structure}\label{sec:fixed}
+
+Let $F=\Fix(\sigma)$, $f=|F|$. A \emph{quadrangle} is a set of four points, no three collinear.
+
+\begin{lemma}\label{lem:quad}
+If $F$ contains a quadrangle, then $F$ is the point set of a proper subplane of order $m\ge2$, and $f=m^2+m+1$.
+\end{lemma}
+\begin{proof}
+Let $\mathcal L_F$ be the fixed lines. By Lemma~\ref{lem:orbits}(c), two points of $F$ lie on a unique line, which is in $\mathcal L_F$, and two lines of $\mathcal L_F$ meet in a point of $F$. The quadrangle makes the structure non-degenerate, so $(F,\mathcal L_F)$ is a projective plane of some order $m\ge2$. If $m=n$ then $F$ is everything and $\sigma=\mathrm{id}$; so $m<n$.
+\end{proof}
+
+\begin{lemma}\label{lem:noquad}
+If $F$ contains no quadrangle, there are a line $\ell$ and a point $P$ with $F\subseteq\ell\cup\{P\}$.
+\end{lemma}
+\begin{proof}
+If $F$ is collinear, take $\ell\supseteq F$. Otherwise take non-collinear $A,B,C\in F$ with \emph{sides} $AB,AC,BC$, and $X=F\setminus\{A,B,C\}$.
+\emph{Step 1: each $D\in X$ lies on a side.} Otherwise no three of $A,B,C,D$ are collinear, so $\{A,B,C,D\}$ is a quadrangle.
+\emph{Step 2.} Two sides meet in a vertex, which is not in $X$; so by Step 1 the parts of $X$ on the three sides partition $X$.
+\emph{Step 3: $X$ meets at most one side.} Let two sides be $UV,UW$ (common vertex $U$), and suppose $D\in X\cap UV$, $E\in X\cap UW$; then $D,E\ne U$. We claim $\{V,W,D,E\}$ is a quadrangle: $V,W,D$ collinear would put $W$ on $VD=UV$ (but $W\notin UV$); $V,W,E$ collinear would put $V$ on $WE=UW$ (but $V\notin UW$); $V,D,E$ collinear would put $E$ on $VD=UV$, hence $E\in UV\cap UW=\{U\}$; $W,D,E$ collinear would put $D=U$. All are impossible, a contradiction.
+Hence $X$ lies on one side, say $AB$, and $F\subseteq AB\cup\{C\}$.
+\end{proof}
+
+\begin{theorem}[Fixed structure]\label{thm:fixed}
+Let $\sigma$ have order $17$ in a plane of order $18$. Then $f\in\{3,20\}$, and
+\begin{enumerate}[label=(\roman*),itemsep=0pt]
+\item if $f=3$, the fixed points $P_0,P_1,P_2$ form a triangle, the fixed lines are exactly its three sides, and each side carries exactly two fixed points;
+\item if $f=20$, $F=\ell\cup\{P\}$ with $P\notin\ell$, and there are exactly $20$ fixed lines.
+\end{enumerate}
+The number of non-fixed point orbits (equal to that of line orbits) is $r=(343-f)/17$, i.e.\ $r=20$ for $f=3$ and $r=19$ for $f=20$.
+\end{theorem}
+\begin{proof}
+By Lemma~\ref{lem:orbits}(a), $f\equiv3\pmod{17}$. If $F$ contains a quadrangle, Lemma~\ref{lem:quad} and Q2 give $m^2\le18$, $m\in\{2,3,4\}$, $f\in\{7,13,21\}$, none $\equiv3$. So Lemma~\ref{lem:noquad} applies and $f\le19+1=20$; thus $f\in\{3,20\}$.
+If $f=20$, then $F=\ell\cup\{P\}$ with $20$ distinct points, so $P\notin\ell$, and there are $20$ fixed lines by Lemma~\ref{lem:orbits}(b).
+If $f=3$ and the fixed points lay on a line $L$, $L$ would be fixed with $f_L=3\not\equiv2$, contradicting Lemma~\ref{lem:orbits}(a). So they form a triangle; its sides are fixed, and there are exactly three fixed lines by (b).
+\end{proof}
+
+\section{The homology configuration is impossible}\label{sec:homology}
+
+\begin{theorem}[Norm-parity lemma]\label{thm:norm}
+Let $\sigma$ have odd prime order $p$ in a plane of order $n$, with $r$ orbits of length $p$ on points. Let $q\ne p$ be a prime with $-1\in\langle q\bmod p\rangle\le(\ZZ/p)^{*}$. Then $r\,v_q(n)$ is even.
+\end{theorem}
+\begin{proof}
+Let $\zeta=e^{2\pi i/p}$. Choose representatives $x_1,\dots,x_r$ of the point orbits and $y_1,\dots,y_r$ of the line orbits of length $p$ (equal numbers by Lemma~\ref{lem:orbits}(b)), and set
+\[A_{ab}=\sum_{k\in\ZZ_p}\zeta^{k}N[x_a,\sigma^{k}y_b]\in\ZZ[\zeta].\]
+Put $u_a=\sum_k\zeta^{k}e_{\sigma^kx_a}$ and $w_b=\sum_k\zeta^{k}e_{\sigma^ky_b}$ (standard Hermitian form); they have disjoint supports, $\langle u_a,u_{a'}\rangle=p\delta_{aa'}$, $\langle w_b,w_{b'}\rangle=p\delta_{bb'}$.
+\emph{Claim: $Nw_b=\sum_aA_{ab}u_a$.} At $x=\sigma^mx_a$: $(Nw_b)(x)=\sum_k\zeta^kN[x_a,\sigma^{k-m}y_b]=\zeta^mA_{ab}=A_{ab}u_a(x)$. At a fixed point $x$: $(Nw_b)(x)=N[x,y_b]\sum_k\zeta^k=0$.
+Since $\sum_k\zeta^k=0$, $Jw_{b'}=0$, so by Q1
+$\langle Nw_b,Nw_{b'}\rangle=\langle w_b,N^TNw_{b'}\rangle=n\langle w_b,w_{b'}\rangle=np\,\delta_{bb'}$.
+By the claim the left side is $p\sum_aA_{ab}\overline{A_{ab'}}$. Hence $A^*A=nI_r$ and $\det A\cdot\overline{\det A}=n^r$.
+Let $\mathfrak p\mid q$ be a prime of $\ZZ[\zeta]$. By Q3 its decomposition group $\langle\gamma_q\rangle$ contains $\gamma_{-1}$, so complex conjugation fixes $\mathfrak p$ and $v_{\mathfrak p}(\overline\alpha)=v_{\mathfrak p}(\alpha)$. As $q$ is unramified, $v_{\mathfrak p}(n)=v_q(n)$, and applying $v_{\mathfrak p}$ gives $2v_{\mathfrak p}(\det A)=r\,v_q(n)$.
+\end{proof}
+
+\begin{corollary}\label{cor:homology}
+There is no collineation of order $17$ with $f=20$ in a plane of order $18$.
+\end{corollary}
+\begin{proof}
+Take $p=17$, $q=2$: $2^4=16\equiv-1$, so $2$ has order $8$ and $-1\in\langle2\rangle$; $v_2(18)=1$. So $r$ is even, but $r=19$ by Theorem~\ref{thm:fixed}.
+\end{proof}
+\begin{remark}
+For $f=3$, $r=20$ is even and nothing follows; for $q=3$, $v_3(18)=2$ and the condition is vacuous. $\QQ(\zeta_{17})$ has $16/8=2$ primes above $2$, each fixed by complex conjugation.
+\end{remark}
+
+\section{The triangle case: reduction to a finite problem}\label{sec:triangle}
+
+Now $\sigma$ has exactly three fixed points $P_0,P_1,P_2$. Write $\{a,b,k\}=\{0,1,2\}$ and $L_k=P_aP_b$. Only $p=17$ prime and $n=p+1$ are used, so the derivation can be tested with other $p$ (Section~\ref{sec:verification}). The letters $r_i,c_j,\tau_k$ below are gauge parameters.
+
+\begin{lemma}[Orbit structure]\label{lem:orbstruct}
+A point is \emph{general} if on no side; a line is \emph{general} if not a side and containing no $P_k$.
+\begin{enumerate}[label=(\alph*),itemsep=0pt]
+\item $S_k:=L_k\setminus\{P_a,P_b\}$ is one orbit of length $17$.
+\item The set $V_k$ of the $17$ lines through $P_k$ other than the sides $L_a,L_b$ is one orbit. A line of $V_k$ meets $L_k$ in one point (of $S_k$), meets $L_a,L_b$ only in $P_k$, and its other $17$ points are general.
+\item There are $289$ general points, forming orbits $O_1,\dots,O_{17}$, and $289$ general lines, forming orbits $H_1,\dots,H_{17}$.
+\item A general line meets each $L_k$ in one point of $S_k$, these three points are distinct, and it has $16$ general points. A general point lies on exactly one line of each $V_0,V_1,V_2$ and on $16$ general lines.
+\item Every line of $V_k$ contains exactly one point of each $O_i$.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+(a) $L_k$ has $19$ points, two fixed; the other $17$ are non-fixed, hence one orbit.
+(b) Of the $19$ lines through $P_k$, two are sides; the other $17$ are not fixed (the fixed lines are the sides), so form one orbit. Such a line meets $L_k$ outside $P_a,P_b$ (else it is a side $P_kP_a$ or $P_kP_b$), and meets $L_a,L_b$ only in $P_k$; of its $19$ points one is $P_k$, one is on $L_k$, and $17$ are general.
+(c) $343-3-3\cdot17=289$ general points, non-fixed, so $17$ orbits. Lines containing a vertex or being a side number $3+3\cdot17=54$ (a non-side contains at most one vertex), leaving $289$ non-fixed lines.
+(d) A general line $\Lambda$ meets each side in a non-vertex point, so in $S_k$; two of these points coincide only at a vertex, so they are distinct and $\Lambda$ has $19-3=16$ general points. For a general point $Q$, the lines $QP_k$ are distinct non-sides, so $QP_k\in V_k$ (the three lines $QP_0,QP_1,QP_2$ are distinct, else $Q$ lies on a side), and the other $16$ lines through $Q$ are general.
+(e) By (d), $\sum_{v\in V_k}|v\cap O_i|=17$; as $V_k$ is one orbit and $O_i$ is invariant, $|v\cap O_i|=c_i$ is constant, so $c_i=1$.
+\end{proof}
+
+\subsection{Coordinates and incidence identities}
+
+Choose $v_k\in V_k$, $s_k:=v_k\cap L_k$, and put $V_{k,w}=\sigma^wv_k$, $(k,z)=\sigma^zs_k$ ($w,z\in\Zp$), so $V_{k,w}\cap L_k=\{(k,w)\}$. Choose $Q_i\in O_i$, $\Lambda_j\in H_j$ ($i,j\in[17]:=\{1,\dots,17\}$), and put $(i,X)=\sigma^XQ_i$, $H_{j,y}=\sigma^y\Lambda_j$. Define
+\[
+f_{ij}=\{t:Q_i\in\sigma^t\Lambda_j\},\quad s^k_j=\text{the }t\text{ with }s_k\in\sigma^t\Lambda_j,\quad u^k_i=\text{the }t\text{ with }Q_i\in\sigma^tv_k .
+\]
+(Well defined: $\Lambda_j\cap L_k$ is one point of $S_k$ and $Q_i$ is on one line of $V_k$, by Lemma~\ref{lem:orbstruct}(d), and $\sigma$ acts regularly on $S_k$ and $V_k$.) Equivariance gives, for all $i,j,k$ and $X,y,z,w\in\Zp$:
+\begin{align}
+(i,X)\in H_{j,y}&\iff y-X\in f_{ij},\tag{I1}\\
+(k,z)\in H_{j,y}&\iff y-z=s^k_j,\tag{I2}\\
+(i,X)\in V_{k,w}&\iff w-X=u^k_i,\tag{I3}\\
+(k,z)\in V_{k,w}&\iff z=w.\tag{I4}
+\end{align}
+By Lemma~\ref{lem:orbstruct}(b), $V_{k,w}$ contains no point of $S_{k'}$ ($k'\ne k$); general lines contain no vertex, and sides no general point.
+
+\begin{proposition}[Incidence identities]\label{prop:inc}
+\begin{enumerate}[label=(\Roman*),itemsep=2pt]
+\item For each $i$, the multiset $\{t-t': j\in[17],\ t,t'\in f_{ij},\ t\ne t'\}$ equals $\Zs$, each element once.
+\item For each $i,k$, the sets $\{t-s^k_j:t\in f_{ij}\}$ ($j\in[17]$) are pairwise disjoint with union $\Zp\setminus\{u^k_i\}$.
+\item For each $j,k$, the sets $\{u^k_i-t:t\in f_{ij}\}$ ($i\in[17]$) are pairwise disjoint with union $\Zp\setminus\{-s^k_j\}$.
+\item For $a\ne b$, $j\mapsto s^a_j-s^b_j$ is a bijection $[17]\to\Zp$.
+\item For $i\ne i'$ put $\delta_k=u^k_i-u^k_{i'}$. Then $\delta_0,\delta_1,\delta_2$ are distinct, and $\{y-y':j,\ y\in f_{ij},\ y'\in f_{i'j}\}$ consists of the $14$ elements of $\Zp\setminus\{\delta_0,\delta_1,\delta_2\}$, each once.
+\item For $j\ne j'$, the elements $s^k_{j'}-s^k_j$ ($k=0,1,2$) are distinct, and $\{t'-t:i,\ t\in f_{ij},\ t'\in f_{ij'}\}$ consists of the $14$ elements outside them, each once. For $j=j'$, $\{t'-t:i,\ t\ne t'\in f_{ij}\}=\Zs$, each once.
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+Each item counts the unique line through two points (or the unique common point of two lines), and decides to which family that line belongs.
+
+(I) For $d\ne0$ the points $(i,0),(i,d)$ lie on one line $\lambda$, not a side, and not in $V_k$ (Lemma~\ref{lem:orbstruct}(e)); so $\lambda=H_{j,y}$ for a unique $(j,y)$, and by (I1) $y,\,y-d\in f_{ij}$. Conversely every such triple gives a line through both points.
+
+(II) For $z\in\Zp$, the line through $(i,0)$ and $(k,z)$ is no side and not in $V_{k'}$, $k'\ne k$. It lies in $V_k$ iff it is $V_{k,w}$ with $w=z$ (I4) and $w=u^k_i$ (I3), i.e.\ iff $z=u^k_i$. Otherwise it is $H_{j,y}$ with $y\in f_{ij}$ (I1) and $y-z=s^k_j$ (I2), i.e.\ $z=t-s^k_j$, $t=y\in f_{ij}$, for a unique $(j,t)$.
+
+(III) $H_{j,0}$ and $V_{k,w}$ meet in one non-vertex point $Z$. If $Z$ is a side point it is $(k,w)$, and lies on $H_{j,0}$ iff $w=-s^k_j$ (I2). If $Z=(i,X)$ is general, (I3) gives $X=w-u^k_i$ and (I1) gives $-X\in f_{ij}$, i.e.\ $w=u^k_i-t$, $t=-X\in f_{ij}$.
+
+(IV) $(a,z)$ and $(b,z')$ lie on one line, not a side and not in any $V_c$ (a line of $V_c$ has exactly one point on $S_0\cup S_1\cup S_2$). So it is $H_{j,y}$ with $y-z=s^a_j$, $y-z'=s^b_j$, i.e.\ $z'-z=s^a_j-s^b_j$, for a unique $j$.
+
+(V) $(i,0)$ and $(i',X)$ lie on one line, not a side. It is in $V_k$ iff it is $V_{k,w}$ with $w=u^k_i$ and $w-X=u^k_{i'}$, i.e.\ $X=\delta_k$. If $\delta_k=\delta_{k'}$ for $k\ne k'$, two distinct lines would contain the same two points; so the $\delta_k$ are distinct. For $X\notin\{\delta_k\}$ the line is $H_{j,y}$ with $y\in f_{ij}$, $y-X\in f_{i'j}$, for a unique $(j,y)$.
+
+(VI) For $(j',y)\ne(j,0)$, $H_{j,0}$ and $H_{j',y}$ meet in one non-vertex point. It is a side point $(k,z)$ iff $-z=s^k_j$ and $y-z=s^k_{j'}$ (I2), i.e.\ iff $y=s^k_{j'}-s^k_j$. It is general $(i,X)$ iff $t:=-X\in f_{ij}$, $t':=y-X\in f_{ij'}$ (I1), i.e.\ $y=t'-t$. If $j=j'$, $y\ne0$, a side point would need $y=0$, so the point is general. If $j\ne j'$, the three $s^k_{j'}-s^k_j$ are distinct (else the lines share two side points), and the count follows.
+\end{proof}
+
+\paragraph{Types of rows.} By (I), a block $f_{ij}$ of size $m$ contributes $\binom m2$ of the $8$ classes $\{\pm d\}$, each exactly once over $j$. So $\sum_j\binom{|f_{ij}|}2=8$, whence $|f_{ij}|\le4$, and $\sum_j|f_{ij}|=16$ by (II). With $\nu_m=\#\{j:|f_{ij}|=m\}$ (not to be confused with the order $n$): $6\nu_4+3\nu_3+\nu_2=8$, $4\nu_4+3\nu_3+2\nu_2+\nu_1=16$, with solutions $(\nu_4,\nu_3,\nu_2,\nu_1)\in\{(0,0,8,0),(0,1,5,3),(0,2,2,6),(1,0,2,8)\}$ ($\nu_4\le1$; $\nu_4=1$ forces $\nu_3=0,\nu_2=2$; if $\nu_4=0$, $\nu_3\le2$).
+
+\subsection{Gauge, normal form, nets}
+
+Replacing $Q_i\mapsto\sigma^{r_i}Q_i$, $\Lambda_j\mapsto\sigma^{c_j}\Lambda_j$, $v_k\mapsto\sigma^{\tau_k}v_k$ changes the data to
+\[f'_{ij}=f_{ij}+r_i-c_j,\qquad s'^k_j=s^k_j-c_j+\tau_k,\qquad u'^k_i=u^k_i+r_i-\tau_k\]
+(e.g.\ $Q'_i\in\sigma^t\Lambda'_j\iff Q_i\in\sigma^{t+c_j-r_i}\Lambda_j$).
+
+\begin{proposition}[Normal form]\label{prop:normal}
+The choices can be made with $s^0_j=0$ and $u^0_i=0$ for all $i,j$. Then
+(a) for each $i$ the sets $f_{ij}$ ($j\in[17]$) partition $\Zs$, and for each $j$ the sets $f_{ij}$ ($i\in[17]$) partition $\Zs$;
+(b) $j\mapsto s^1_j$, $j\mapsto s^2_j$, $j\mapsto s^2_j-s^1_j$ are bijections $[17]\to\Zp$.
+\end{proposition}
+\begin{proof}
+Take $\tau_k=0$, $c_j=s^0_j$, $r_i=-u^0_i$. (a) is Proposition~\ref{prop:inc}(II),(III) for $k=0$ (in (III) the sets $-f_{ij}$ partition $\Zp\setminus\{0\}$). (b) is (IV) applied to the three pairs of sides, using $s^0=0$.
+\end{proof}
+The residual freedom is $c_j=r_i=\tau_0$ constant and arbitrary $\tau_1,\tau_2$: all $f_{ij}$ are unchanged and $s^k_j\mapsto s^k_j+\tau_k-\tau_0$ ($k=1,2$).
+
+\paragraph{The net.} By (b) name the columns by $\alpha=s^1_j\in\Zp$, write $f_{i\alpha}$, and define $\theta(\alpha)=s^2_j$. Then $\theta$ and $\theta-\mathrm{id}$ are bijections: $\theta$ is an \emph{orthomorphism} of $\Zp$, and $\Theta=\{(s^1_j,s^2_j)\}$ is a transversal of the cyclic Latin square of order $17$ (it meets each of $x=c$, $y=c$, $y-x=c$ once, as $\theta$ and $\theta-\mathrm{id}$ are bijections). Residual translations replace $\Theta$ by $\Theta+(a,b)$, so we may assume $\theta(0)=0$; let $\Orth_0$ be the set of such $\theta$.
+
+\subsection{Rows and compatibility}
+
+For each row $i$ define $g_i:\Zs\to\Zp$ by $g_i(x)=\alpha$ iff $x\in f_{i\alpha}$ (Proposition~\ref{prop:normal}(a)); the \emph{cells} are $C_\alpha=g^{-1}(\alpha)$.
+
+\begin{definition}[Rows]\label{def:rows}
+$\Rows(\theta)$ is the set of $g:\Zs\to\Zp$ such that:
+(R1) the multiset of differences $x-x'$ ($x\ne x'$ in a common cell) is exactly $\Zs$;
+(R2) $x\mapsto x-g(x)$ is injective; $u^1(g)$ denotes the missing element of $\Zp$;
+(R3) $x\mapsto x-\theta(g(x))$ is injective; $u^2(g)$ denotes the missing element;
+(R4) for columns $\alpha\ne\beta$ the differences $y-x$ ($x\in C_\alpha,y\in C_\beta$) are pairwise distinct and differ from $\beta-\alpha$ and $\theta(\beta)-\theta(\alpha)$.
+\end{definition}
+
+\begin{proposition}[Rows]\label{prop:rows}
+In the normal form each $g_i\in\Rows(\theta)$, with $u^k(g_i)=u^k_i$ ($k=1,2$).
+\end{proposition}
+For a fixed net the rows are independent objects: $\Rows(\theta)$ depends on $\theta$ only, and the only coupling is pairwise compatibility.
+\begin{proof}
+(R1) is (I). (R2), (R3) are (II) for $k=1,2$ with $s^1_j=\alpha_j$, $s^2_j=\theta(\alpha_j)$. (R4): for columns $\alpha\ne\beta$ ($j\ne j'$), by (VI) the differences $t'-t$ over all rows are distinct and avoid $s^k_{j'}-s^k_j$, i.e.\ $\beta-\alpha$ and $\theta(\beta)-\theta(\alpha)$; restrict to row $i$.
+\end{proof}
+
+\begin{definition}[Compatibility]\label{def:compat}
+Rows $g,g'\in\Rows(\theta)$ are \emph{compatible} if, with $\delta_0=0$, $\delta_k=u^k(g)-u^k(g')$:
+(C1) $\delta_0,\delta_1,\delta_2$ are distinct and $\{y-y':\alpha\in\Zp,\ y\in C_\alpha,\ y'\in C'_\alpha\}$ consists of the $14$ elements of $\Zp\setminus\{\delta_0,\delta_1,\delta_2\}$, each once;
+(C2) for columns $\alpha\ne\beta$ the sets $\{y-x:x\in C_\alpha,y\in C_\beta\}$ and $\{y-x:x\in C'_\alpha,y\in C'_\beta\}$ are disjoint.
+\end{definition}
+
+\begin{proposition}[Pairs]\label{prop:pairs}
+In the normal form, $g_i,g_{i'}$ are compatible for $i\ne i'$.
+\end{proposition}
+\begin{proof}
+(C1) is (V) (with $\delta_0=u^0_i-u^0_{i'}=0$); (C2) is (VI), since all differences over all rows in a column pair are distinct.
+\end{proof}
+
+\begin{remark}\label{rem:redundant}
+Compatible rows satisfy $\sum_\alpha|C_\alpha||C'_\alpha|=14$ and $g(x)\ne g'(x)$ for all $x$ (since $0\notin$ (C1)), and no two difference classes $\pm d$ occur once in a cell of $g$ and once in a cell of $g'$ of the same column. The program uses these as pre-filters; they add nothing logically.
+\end{remark}
+
+\begin{lemma}[Bucket lemma]\label{lem:bucket}
+In the normal form, for each $x\in\Zs$ the map $i\mapsto g_i(x)$ is a bijection $[17]\to\Zp$. Hence with $B_\theta(x,c)=\{g\in\Rows(\theta):g(x)=c\}$ (the \emph{buckets}), if some $g_i\in B_\theta(1,0)$, then for every $c\ne0$ the bucket $B_\theta(1,c)$ contains a row compatible with $g_i$ (namely the $g_{i'}$ with $g_{i'}(1)=c$).
+\end{lemma}
+\begin{proof}
+By Proposition~\ref{prop:normal}(a), for each column $\alpha$ the cells $f_{i\alpha}$ ($i\in[17]$) partition $\Zs$, so $x$ lies in exactly one.
+\end{proof}
+
+\subsection{Symmetry and classes}
+
+Let $G$ be the group generated by translations of $\Zp^2$, the maps $(x,y)\mapsto(mx,my)$, $m\in\Zs$, and $(x,y)\mapsto(y,x)$, $(x,y)\mapsto(-x,y-x)$ (these two generate $S_3$).
+
+\begin{proposition}[Symmetry]\label{prop:sym}
+If $(\Pi,\sigma)$ of triangle type yields the net $\Theta$ in normal form, then for every $\gamma\in G$ there are coordinates of the same type yielding $\gamma(\Theta)$.
+\end{proposition}
+\begin{proof}
+Translations: the residual freedom. Scalars: replace $\sigma$ by the generator $\sigma^m$; then $s^k_j$ becomes $m^{-1}s^k_j$. Relabel the vertices by a permutation $\pi$: $s^k_j\mapsto s^{\pi(k)}_j$, and renormalise by subtracting $s^{\pi(0)}_j$; the new net is $\{(s^{\pi(1)}_j-s^{\pi(0)}_j,\ s^{\pi(2)}_j-s^{\pi(0)}_j)\}$. In the coordinates $(x,y)=(s^1_j-s^0_j,s^2_j-s^0_j)$, swapping $1,2$ is $(x,y)\mapsto(y,x)$ and swapping $0,1$ is $(x,y)\mapsto(-x,y-x)$.
+\end{proof}
+
+Orthomorphisms $\theta,\theta'\in\Orth_0$ are \emph{equivalent} if $\gamma(\mathrm{graph}\,\theta)=\mathrm{graph}\,\theta'$ for some $\gamma\in G$. A class consists of the normalised orthomorphisms obtained from $L(\mathrm{graph}\,\theta)$, for $L$ in the group of $16\cdot6=96$ linear maps, by translating one of its $17$ points to the origin; so it has at most $17\cdot96=1632$ elements. Its \emph{representative} is the lexicographically smallest $(\theta(1),\dots,\theta(16))$.
+
+\begin{theorem}[Reduction]\label{thm:reduction}
+If $\Pi$ has order $18$ and a collineation $\sigma$ of order $17$ with exactly $3$ fixed points, there are a class representative $\theta$ and pairwise compatible rows $g_1,\dots,g_{17}\in\Rows(\theta)$ such that $g_1(x),\dots,g_{17}(x)$ are distinct for every $x$. In particular, for the row $g$ with $g(1)=0$ and every $c\in\{1,\dots,16\}$, $B_\theta(1,c)$ contains a row compatible with $g$.
+\end{theorem}
+\begin{proof}
+Normal form (Proposition~\ref{prop:normal}) with $\theta$ a representative (Proposition~\ref{prop:sym}); rows by Proposition~\ref{prop:rows}, compatibility by Proposition~\ref{prop:pairs}, distinctness and the last claim by Lemma~\ref{lem:bucket}.
+\end{proof}
+
+All conditions used are necessary; compatibility is weaker than the full set of incidence identities, which suffices since only non-existence is to be shown. The search therefore tests, for each class representative $\theta$,
+\begin{equation}\tag{$\star_\theta$}
+\forall g\in B_\theta(1,0)\ \ \exists c\in\{1,\dots,16\}:\ \text{no row of }B_\theta(1,c)\text{ is compatible with }g.
+\end{equation}
+
+\section{The computation}\label{sec:computation}
+
+The $1{,}606{,}008{,}513$ orthomorphisms of $\ZZ_{17}$, of which $94{,}471{,}089$ are normalised, fall into $58{,}161$ classes under $G$ (exhaustive enumeration with a canonicity test, \texttt{orth.cpp}); Table~\ref{tab:classes} gives the class sizes. The set $\mathcal F$ of partitions of $\Zs$ satisfying (R1) (``families'') has $490{,}801=3857+351360+119168+16416$ members, for the four types $(\nu_4,\nu_3,\nu_2,\nu_1)$ of Section~\ref{sec:triangle}, in the order listed there (obtained by enumeration; no closed formula is known; the count is used only to describe the search).
+
+\begin{table}[ht]
+\centering\small
+\begin{tabular}{rrrrrrrr|r}
+\toprule
+class size & 3 & 6 & 102 & 204 & 408 & 816 & 1632 & total\\
+number of classes & 1 & 2 & 3 & 6 & 27 & 486 & 57\,636 & 58\,161\\
+orthomorphisms & 3 & 12 & 306 & 1\,224 & 11\,016 & 396\,576 & 94\,061\,952 & 94\,471\,089\\
+\bottomrule
+\end{tabular}
+\caption{Classes of normalised orthomorphisms of $\ZZ_{17}$. The sizes $3,6,6$ account for the $15$ linear orthomorphisms $\theta(x)=\lambda x$, $\lambda\ne0,1$, on which $S_3$ acts anharmonically (a consistency check).}\label{tab:classes}
+\end{table}
+
+\begin{algorithm}[ht]
+\caption{Test of $(\star_\theta)$ for one representative $\theta$}\label{alg:main}
+\begin{algorithmic}[1]
+\Require $\theta\in\Orth_0$; the list $\mathcal F$ (same for all $\theta$)
+\State generate lazily $B(c)=B_\theta(1,c)$, $c=0,\dots,16$: place the blocks of each family in distinct columns with $1$ in column $c$; prune by (R2),(R3); check (R4); record $u^1,u^2$
+\State $\mathit{Cand}\gets B(0)$
+\For{$c=1,\dots,16$ \textbf{while} $\mathit{Cand}\ne\emptyset$}
+  \State $\mathit{Cand}\gets\{g\in\mathit{Cand}:\exists h\in B(c)\text{ compatible with }g\}$ \Comment{necessary by Lemma~\ref{lem:bucket}}
+\EndFor
+\State \Return \textsc{Eliminated} if $\mathit{Cand}=\emptyset$; else run an exact $17$-clique search with one row from each bucket containing a survivor
+\end{algorithmic}
+\end{algorithm}
+
+Compatibility is tested in the order: (a) $\sum_\alpha|C_\alpha||C'_\alpha|=14$ (SIMD); (b) $g(x)\ne h(x)$ for all $x$; (c) no common same-column difference class; (d) (C1) by bitmasks; (e) (C2) by bitsets indexed by (column pair, difference). Tests (a)--(c) are implied by (d),(e) (Remark~\ref{rem:redundant}).
+
+\begin{theorem}[Computational]\label{thm:comp}
+$(\star_\theta)$ holds for each of the $58{,}161$ class representatives. Indeed $\mathit{Cand}=\emptyset$ after the step $c=3$ for every $\theta$; the exact search is never invoked (zero survivors, $17$-cliques and nodes).
+\end{theorem}
+\noindent Established by computer; data in \texttt{run\_out.txt} (one line per net), summarised in Table~\ref{tab:results}.
+
+\begin{table}[ht]
+\centering\small
+\begin{tabular}{lr}
+\toprule
+quantity & value\\
+\midrule
+class representatives processed & 58\,161 (ids $0$--$58160$, once each)\\
+$|B(0)|$, range (mean) & 23\,696--27\,776 (26\,774)\\
+nets with $\mathit{Cand}=\emptyset$ first at $c=1$ / $c=2$ / $c=3$ & 0 / 57\,538 / 623\\
+survivors after $c=1$: total (max per net) & 971\,489 (37)\\
+survivors after $c=2$: total (max per net) & 627 (2)\\
+survivors after $c=3$; $17$-cliques; exact-search nodes & 0; 0; 0\\
+total CPU time & 179\,471 s ($\approx49.9$ core-hours)\\
+\bottomrule
+\end{tabular}
+\caption{The run for $p=17$, recomputed from \texttt{run\_out.txt} by one \texttt{awk} line.}\label{tab:results}
+\end{table}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+By Theorem~\ref{thm:fixed}, $f\in\{3,20\}$. Corollary~\ref{cor:homology} excludes $20$. If $f=3$, Theorem~\ref{thm:reduction} gives a representative $\theta$ for which $(\star_\theta)$ fails, contradicting Theorem~\ref{thm:comp}.
+\end{proof}
+
+\section{Verification, assumptions and limitations}\label{sec:verification}
+
+\subsection{Controls}
+The reduction uses only that $\sigma$ has prime order $p$, $n=p+1$, and a fixed triangle. Replacing $17$ by $p$ throughout ($(p-1)/2$ difference classes, $p-3$ for $14$, etc.), the same program (\texttt{-DP=$p$}) applies to $n=p+1$.
+
+\begin{table}[ht]
+\centering\small
+\begin{tabular}{rrrrrll}
+\toprule
+$p$ & $n$ & $|\Orth_0|$ & classes & with sol. & plane of order $n$ & output\\
+\midrule
+3 & 4 & 1$^{\dagger}$ & 1 & 1 & exists & as expected ($1$ clique)\\
+5 & 6 & 3 & 1 & 0 & none & as expected\\
+7 & 8 & 19 & 3 & 2 & exists & as expected\\
+11 & 12 & 3\,441 & 11 & 0 & open & no information\\
+13 & 14 & 79\,259 & 117 & 0 & none & as expected\\
+31 & 32 & --- & --- & --- & PG(2,32) & true plane found (below)\\
+\midrule
+17 & 18 & 94\,471\,089 & 58\,161 & 0 & open & ---\\
+\bottomrule
+\end{tabular}
+\caption{Controls. $p=7$: $4$ cliques on the $3$ representatives; on all $133$ transversal nets (no reduction) $35$ nets carry $70$ solutions, each verified to be a plane of order $8$ (\texttt{plane.py}). $p=5$: the family list has one member and no valid row exists. $^{\dagger}$\texttt{orth.cpp} needs $p\ge5$; for $p=3$ the unique $\theta(x)=2x$ was entered by hand. Entries with output $0$ are weak tests (a bug discarding too much also gives $0$); the positive controls are $p=3,7$, and $p=31$ only via ported predicates (see below).}\label{tab:controls}
+\end{table}
+
+\paragraph{Why positive controls are in characteristic 2.} A genuine control needs a plane of order $n=p+1$ with a collineation of prime order $p$ with a fixed triangle. All known planes have prime-power order $q^k$ with $q^k-1$ prime: for odd $q$ this forces $n=3$, $p=2$ (excluded, $p$ must be odd); for $q=2$, $p=2^k-1$ is a Mersenne prime, $n=4,8,32,128,\dots$. We use the Desarguesian planes $\mathrm{PG}(2,2^k)$ with $2^k-1$ prime as controls; they have such a collineation ($\mathrm{diag}$ of order $2^k-1$). Other known planes with such an automorphism may exist (e.g.\ non-Desarguesian planes of order $32$) but were not used. A non-Desarguesian plane of order $q^2$, $q>2$, has $n-1=(q-1)(q+1)$ composite. So the controls available are $p=3,7,31,127$; $p=127$ was not attempted. The $p=3,7$ controls test that true solutions survive the necessary conditions, pruning and the bucket lemma, but not features specific to $17$: the family list, blocks of size $4$ (which need $p\ge13$), or the code paths for $17$ columns.
+
+\paragraph{Control $p=31$ ($\mathrm{PG}(2,32)$).} Elements $\sigma_c=\mathrm{diag}(1,g,g^c)$, $c=2,\dots,30$ (for $c=2$ alone all blocks have size $\le2$, as for $p=7$; for $\sigma_c$ blocks are roots of a trinomial, with sizes $1,2,3,5$; size $4$ occurs only at $N=63$, composite). From the explicit geometry of the $29$ elements, the quotient data were computed, and the normal form, (R1)--(R3), the net conditions, the bucket argument and the compatibility predicates accepted all: $31/31$ true rows, $465/465$ true row pairs; about $5000$ single-entry perturbations of true rows rejected; the exact search finds exactly one $31$-clique, the true plane; the $1057$-point structure rebuilt from the quotient data satisfies the axioms. These tests used hand-ported $64$-bit predicates and generators (\texttt{ctrl\_p.cpp}; regression on $\mathrm{PG}(2,8),\mathrm{PG}(2,16)$ passes). A parametrised copy of \texttt{fast4.cpp} reproduces the first $500$ lines of the $P=17$ run and the $P=7$ results on all $133$ nets, and at $P=31$ returns exactly the true plane for $c=3,\dots,30$ except $16$, and $6$ variants, with and without decoy (extra random false) families; at $P=63$ blocks of size $4$ were tested with injected rows (generator bypassed).
+\emph{Not done:} the original \texttt{fast4.cpp} at $p=31$ (its SIMD tables are fixed at $17$); $c=2$, $c=16$ and the all-pairs row type (generator memory); the full $\Rows(\theta)$ at $p=31$; the generator on families with $4$-blocks; equality of the parametrised build with the $p=17$ binary on all $58{,}161$ nets. The control shows the quotient derivation is not contradicted by real planes; it says nothing about non-existence.
+
+\subsection{Independent checks}
+\begin{itemize}[leftmargin=*,itemsep=1pt]
+\item \textbf{Independent re-implementations from the same derivation.} \texttt{indep.cpp} agrees with the main program byte for byte on the row sets $B(1,0),B(1,1),B(1,2)$ of a test net and on survivor counts. \texttt{mine.cpp} ($p=3,5,7,11,13$) and \texttt{mine17b.cpp} ($p=17$) agree on all controls and, for $p=17$, on $|B(1,0)|,a_1,a_2,a_3$ for $40$ random nets and $8$ nets with $a_2>0$ ($a_i$: candidates left after filtering step $i$).
+\item \textbf{Reproduction from this paper alone.} A second implementation, written without the original code, reproduced the $490{,}801$ families, the $94{,}471{,}089$ orthomorphisms and the $58{,}161$ classes with the same size histogram (its own canonical form), passed the controls $p=3,5,7,11,13$ (these controls were run by the independent reproducer; I cannot confirm a re-run of the original implementation when preparing this text), and decided all $58{,}161$ classes with $0$ cliques (interrupted once at $8{,}926$ classes, resumed from checkpoint). Verdicts agree; per-class statistics are not comparable.
+\item \textbf{Counting.} The class sizes sum to $94{,}471{,}089$; \texttt{cnt.cpp} (depth-first) gives the same and $\times17=1{,}606{,}008{,}513$; $200$ random orthomorphisms canonicalise into the list; \texttt{orbsum.cpp, orb.cpp} enumerate orbits explicitly; the class list regenerated from scratch has the same sorted content. The family count and its split were reproduced by \texttt{fam.cpp} and \texttt{indep.cpp}.
+\item \textbf{Oracle and SAT.} \texttt{oracle\_pairs.py} tests compatibility of $257$ pairs on a net by building the partial incidence structure from the axioms; it agrees with the C++ function. A direct CP-SAT model of the axioms with only the gauge conditions $s^0=u^0=0$ confirms Proposition~\ref{prop:normal} for $p=3,7$ (infeasible when negated) and shows infeasibility for $p=5$.
+\item \textbf{Re-run.} For this paper $2{,}760$ nets of the $p=17$ run (ids $0$--$759$, $30000$--$31999$) were re-run with output identical to \texttt{run\_out.txt} except run time. The full $p=17$ search was not repeated.
+\end{itemize}
+
+\subsection{Assumptions}\label{sec:assumptions}
+Theorem~\ref{thm:main} rests on:
+\begin{enumerate}[label=\textbf{A\arabic*.},leftmargin=*,itemsep=0pt]
+\item the quoted facts Q1--Q3 (Bruck's bound is the only non-elementary plane-geometric input);
+\item the correctness of the hand derivation of Section~\ref{sec:triangle} (re-derived by a second, non-blind reader and consistent with the CP-SAT model for $p=3,7$; no human referee);
+\item the correctness of the enumeration of class representatives and of Proposition~\ref{prop:sym};
+\item the correctness of the search with respect to Definitions~\ref{def:rows} and \ref{def:compat}: its row generator produces all of $B_\theta(1,c)$, and its compatibility test implies (C1),(C2). Only necessary conditions are tested, so a test that is too weak cannot lose a solution, whereas one that is too strong could;
+\item correct execution on the hardware used.
+\end{enumerate}
+
+\subsection{Limitations}
+This is a computer-assisted result with no human referee. The row generator (forward checking, trie of block structures, SIMD) is checked against a naive generator and independent implementations on some nets but is not formally verified; a proof-producing check (an independent simple program recomputing $B(1,c)$, or a certificate for ``no compatible row'') would be valuable. All implementations, including the reproduction from the paper, share the derivation of Section~\ref{sec:triangle}: they are independent in implementation, not in logic, and the logic was re-derived only by a second non-blind reader. Proposition~\ref{prop:sym} was also checked numerically ($p=7,11$: row counts and solution counts are constant on classes). At $p=31$ the production code was ported and run, but the full row set was not enumerated, $c=2,16$ and \texttt{a28\_b25} were not run, and the $4$-block generator was not tested; this control is partial, and a derivation-independent check is open. Novelty is not verified. The result concerns only the prime $17$; the primes $2,3,5,7,19$ remain open for order $18$, and existence of a plane of order $18$ is untouched.
+
+\paragraph{AI assistance.} Most derivations, programs and verification were produced by AI agents (large language models, Claude by Anthropic) under the author's direction; the author set the problem, directed the research and judged the results. The argument does not rely on their authority: every step of Sections~\ref{sec:fixed}--\ref{sec:homology} and \ref{sec:triangle} is written out for human checking, and the code and data are held by the author (Section~\ref{sec:repro}). The work has not been independently re-checked by a human specialist; a human re-derivation of Section~\ref{sec:triangle} and a run on other hardware are the most useful checks.
+
+\appendix
+\section{Reproduction}\label{sec:repro}
+
+The programs and the output files (class list, run output, logs) are held by the author and are not part of this repository; they are available from the author on request. Until they are made public, the computer-assisted part of the proof cannot be re-checked by others. Requirements: AVX2, OpenMP; \texttt{-march=native} makes the build machine dependent. Compiler: MinGW-w64 GCC 16.1.0 (WinLibs); the compiler of the original run was not recorded and is assumed the same.
+\begin{verbatim}
+g++ -O3 -march=native -fopenmp -DP=17 fast4.cpp -o netrun17.exe
+OMP_NUM_THREADS=12 ./netrun17.exe classes17.txt 0 58161 run_out.txt run
+awk '{a2+=$7;s+=$13;c+=$17} END{print NR,a2,s,c}' run_out.txt   # 58161 627 0 0
+\end{verbatim}
+Interrupted runs resume by re-running the command (ids already in the output are skipped). Classes are regenerated by \texttt{./orth classes <file>} (about $10$ s; output order depends on thread scheduling, the set does not). Cost: about $3$ s CPU per net on average (maximum $6.75$ s), about $4$ h wall clock on $12$ threads; memory a few hundred MB per thread.
+
+\paragraph{Interrupted run.} The original run was started as \texttt{fastrun.exe}; after $727$ nets the executable vanished from disk and the process ended (cause unknown; anti-virus suspected). The same source, compiled as \texttt{netrun17.exe} (byte-identical to \texttt{fast4.cpp}), was restarted by \texttt{watchdog.sh} (log: \texttt{done=727}) and finished in about $4$ h. The output has $58{,}161$ lines, ids $0,\dots,58160$ once each; the first $727$ come from the first executable, whose exact command line (notes: \texttt{-O3 -march=native -DP=17}) was not preserved. These $727$ nets were recomputed with identical results.
+
+\paragraph{Checksums (SHA-256).}
+{\tiny\setlength{\tabcolsep}{3pt}\begin{tabular}{ll}
+\texttt{fast4.cpp} & \texttt{eb3f3ca800d6cee24255b14f25e543c7a30495051ed2f62e650ac112b37713bb}\\
+\texttt{classes17.txt} & \texttt{aacf1791e82d5ad9b69a17ec32ef0d4c803a9a58e75585554bcbdcc72e8d7bbc}\\
+\texttt{run\_out.txt} & \texttt{86cff376cd5a3468aac2403618a6a046b7d260670ee347e85510b3f9f8598f1b}\\
+\texttt{orth.cpp} & \texttt{74665a45165fc4c430778c9ade9b72209c521a073be2e8a9140c4792ab0af7a5}\\
+\texttt{orbsum.cpp} & \texttt{3a96c58b848891994825974e3ca895e893dfb3484784a57164fd472ff24189ab}
+\end{tabular}}
+The file \texttt{orth.cpp} was edited after the first checksum was taken (output handling only); the hash above is that of the archived file. The sorted regenerated class list has SHA-256 \texttt{c3e3937b\dots e111e}, equal to that of the archived list sorted likewise.
+
+{\footnotesize
+\bibliographystyle{plain}
+\bibliography{refs}}
+
+\end{document}
